@@ -204,8 +204,8 @@
 
         #camera-view {
             width: 80%;
-            height: 70%;
-            margin: 2% auto;
+            height: 60%;
+            margin: 2% auto 0;
             border: 5px solid #00ff00;
             background: #1a1a1a;
             position: relative;
@@ -226,17 +226,30 @@
         }
 
         .animatronic {
-            width: 120px;
-            height: 180px;
+            width: 140px;
+            height: 200px;
             background: #444;
             border: 3px solid #fff;
             display: none;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
             font-size: 1em;
             font-weight: bold;
-            margin: 5px;
+            margin: 10px;
             flex-shrink: 0;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+        }
+
+        .animatronics-container {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            padding: 20px;
+            margin-top: 80px;
+            max-width: 95%;
         }
 
         #camera-name {
@@ -251,25 +264,11 @@
 
         #camera-map {
             width: 90%;
-            margin: 0 auto;
+            margin: 20px auto 10px;
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 10px;
             padding: 20px;
-        }
-
-        .camera-btn {
-            background: #222;
-            border: 2px solid #00ff00;
-            color: #00ff00;
-            padding: 15px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .camera-btn:hover, .camera-btn.active {
-            background: #00ff00;
-            color: #000;
         }
 
         #toggle-camera {
@@ -291,8 +290,145 @@
             color: #000;
         }
 
-        /* Game Over */
-        #game-over {
+        .camera-btn {
+            background: #222;
+            border: 2px solid #00ff00;
+            color: #00ff00;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .camera-btn:hover, .camera-btn.active {
+            background: #00ff00;
+            color: #000;
+        }
+
+        /* Botón de pausa */
+        #pause-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            background: #333;
+            border: 2px solid #ffff00;
+            color: #ffff00;
+            cursor: pointer;
+            font-size: 1.1em;
+            z-index: 102;
+        }
+
+        #pause-btn:hover {
+            background: #ffff00;
+            color: #000;
+        }
+
+        /* Menú de pausa */
+        #pause-menu {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.95);
+            z-index: 150;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #pause-menu h2 {
+            color: #ffff00;
+            font-size: 3em;
+            margin-bottom: 50px;
+        }
+
+        .pause-btn {
+            background: #333;
+            border: 2px solid #ffff00;
+            color: #ffff00;
+            padding: 15px 50px;
+            margin: 15px;
+            font-size: 1.3em;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .pause-btn:hover {
+            background: #ffff00;
+            color: #000;
+        }
+
+        /* Pantalla de salida */
+        #quit-screen {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            z-index: 200;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #quit-screen h2 {
+            color: #ff0000;
+            font-size: 4em;
+            margin-bottom: 30px;
+        }
+
+        /* Pantalla del periódico */
+        #newspaper-screen {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            z-index: 201;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        #newspaper-screen img {
+            max-width: 90%;
+            max-height: 90%;
+            object-fit: contain;
+            box-shadow: 0 0 50px rgba(255,255,0,0.3);
+        }
+
+        /* Pantalla de jumpscare */
+        #jumpscare-screen {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            z-index: 202;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #jumpscare-screen img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            animation: jumpscare 0.2s ease-in-out;
+        }
+
+        @keyframes jumpscare {
+            0% { transform: scale(0.8); opacity: 0; }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); opacity: 1; }
+        }
             display: none;
             position: absolute;
             top: 0;
@@ -386,6 +522,9 @@
 
     <!-- Juego -->
     <div id="game">
+        <!-- Botón de pausa -->
+        <button id="pause-btn" onclick="togglePause()">⏸ PAUSA</button>
+
         <!-- HUD -->
         <div id="hud">
             <div id="battery">BATERÍA: 100%</div>
@@ -415,10 +554,22 @@
                 <div class="camera-content static">
                     <span id="camera-name">CÁMARA 1A - ESCENARIO</span>
                     <div class="animatronics-container">
-                        <div id="freddy-cam" class="animatronic" style="background: #8B4513;">FREDDY</div>
-                        <div id="bonnie-cam" class="animatronic" style="background: #4B0082;">BONNIE</div>
-                        <div id="chica-cam" class="animatronic" style="background: #FFD700; color: #000;">CHICA</div>
-                        <div id="foxy-cam" class="animatronic" style="background: #DC143C;">FOXY</div>
+                        <div id="freddy-cam" class="animatronic" style="background: linear-gradient(135deg, #8B4513 0%, #654321 100%); border-color: #654321;">
+                            <div style="font-size: 1.2em;">🐻</div>
+                            <div>FREDDY</div>
+                        </div>
+                        <div id="bonnie-cam" class="animatronic" style="background: linear-gradient(135deg, #6A5ACD 0%, #4B0082 100%); border-color: #4B0082;">
+                            <div style="font-size: 1.2em;">🐰</div>
+                            <div>BONNIE</div>
+                        </div>
+                        <div id="chica-cam" class="animatronic" style="background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%); color: #000; border-color: #FFA500;">
+                            <div style="font-size: 1.2em;">🐤</div>
+                            <div>CHICA</div>
+                        </div>
+                        <div id="foxy-cam" class="animatronic" style="background: linear-gradient(135deg, #8B0000 0%, #DC143C 100%); border-color: #8B0000;">
+                            <div style="font-size: 1.2em;">🦊</div>
+                            <div>FOXY</div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -435,6 +586,30 @@
         </div>
 
         <button id="toggle-camera" onclick="toggleCamera()">ABRIR CÁMARAS [ESPACIO]</button>
+
+        <!-- Menú de pausa -->
+        <div id="pause-menu">
+            <h2>PAUSA</h2>
+            <button class="pause-btn" onclick="togglePause()">REANUDAR</button>
+            <button class="pause-btn" onclick="quitGame()">SALIR</button>
+        </div>
+
+        <!-- Pantalla de salida -->
+        <div id="quit-screen">
+            <h2>HAS PERDIDO</h2>
+            <p style="font-size: 1.5em; margin-bottom: 30px;">Abandonaste la noche...</p>
+            <button class="menu-btn" onclick="showNewspaper()">CONTINUAR</button>
+        </div>
+
+        <!-- Pantalla del periódico (abandono) -->
+        <div id="newspaper-screen" onclick="handleNewspaperClick()">
+            <img src="golden.jpg" alt="Golden Freddy">
+        </div>
+
+        <!-- Pantalla de jumpscare -->
+        <div id="jumpscare-screen" onclick="handleJumpscareClick()">
+            <img id="jumpscare-img" src="" alt="Jumpscare">
+        </div>
 
         <!-- Game Over -->
         <div id="game-over">
@@ -457,10 +632,12 @@
         let hour = 0;
         let difficulty = 1;
         let gameRunning = false;
+        let gamePaused = false;
         let cameraOpen = false;
         let leftDoorClosed = false;
         let rightDoorClosed = false;
         let currentCamera = '1A';
+        let gameIntervals = [];
 
         // Posiciones de los animatrónicos
         const animatronics = {
@@ -524,21 +701,25 @@
         }
 
         function initGame() {
+            // Limpiar intervalos anteriores
+            gameIntervals.forEach(interval => clearInterval(interval));
+            gameIntervals = [];
+            
             // Iniciar reloj (6 minutos = 360 segundos = 6 horas del juego)
-            setInterval(updateTime, 60000); // 1 hora = 1 minuto real
+            gameIntervals.push(setInterval(updateTime, 60000)); // 1 hora = 1 minuto real
             
             // Consumo de batería
-            setInterval(updateBattery, 100);
+            gameIntervals.push(setInterval(updateBattery, 100));
             
             // Movimiento de animatrónicos
-            setInterval(moveAnimatronics, 5000 / difficulty);
+            gameIntervals.push(setInterval(moveAnimatronics, 5000 / difficulty));
             
             // Foxy check
-            setInterval(foxyCheck, 3000 / difficulty);
+            gameIntervals.push(setInterval(foxyCheck, 3000 / difficulty));
         }
 
         function updateTime() {
-            if (!gameRunning) return;
+            if (!gameRunning || gamePaused) return;
             hour++;
             document.getElementById('time').textContent = `${hour + 12 > 12 ? hour : hour + 12} AM`;
             
@@ -548,7 +729,7 @@
         }
 
         function updateBattery() {
-            if (!gameRunning) return;
+            if (!gameRunning || gamePaused) return;
             
             let drain = 0;
             if (cameraOpen) drain += 0.05;
@@ -644,7 +825,7 @@
         }
 
         function moveAnimatronics() {
-            if (!gameRunning) return;
+            if (!gameRunning || gamePaused) return;
             
             // Freddy
             if (Math.random() < 0.3 * difficulty / 10) {
@@ -681,7 +862,7 @@
         }
 
         function foxyCheck() {
-            if (!gameRunning) return;
+            if (!gameRunning || gamePaused) return;
             
             // Si no miras a Foxy, avanza
             if (currentCamera !== '1C' && cameraOpen) {
@@ -739,7 +920,7 @@
 
         function checkJumpscare(name) {
             setTimeout(() => {
-                if (!gameRunning) return;
+                if (!gameRunning || gamePaused) return;
                 
                 if (name === 'bonnie' && !leftDoorClosed && animatronics.bonnie.atDoor) {
                     gameOver('Bonnie te ha atrapado!');
@@ -775,10 +956,30 @@
 
         function gameOver(msg) {
             gameRunning = false;
-            document.getElementById('game-over').style.display = 'flex';
-            if (msg) {
-                document.getElementById('game-over').children[1].textContent = msg;
+            
+            // Determinar qué animatrónico causó el game over
+            let jumpscareImage = '';
+            if (msg.includes('Freddy')) {
+                jumpscareImage = 'fredy.jpg';
+            } else if (msg.includes('Bonnie')) {
+                jumpscareImage = 'boni.jpg';
+            } else if (msg.includes('Chica')) {
+                jumpscareImage = 'chica.jpeg';
+            } else if (msg.includes('Foxy')) {
+                jumpscareImage = 'foxy.jpg';
+            } else {
+                jumpscareImage = 'golden.jpg'; // Por defecto o por quedarse sin energía
             }
+            
+            // Mostrar jumpscare
+            const jumpscareScreen = document.getElementById('jumpscare-screen');
+            const jumpscareImg = document.getElementById('jumpscare-img');
+            jumpscareImg.src = jumpscareImage;
+            jumpscareScreen.style.display = 'flex';
+            
+            // Reproducir sonido de susto (opcional, puedes agregar audio después)
+            // const scareSound = new Audio('scream.mp3');
+            // scareSound.play();
         }
 
         function victory() {
@@ -786,11 +987,67 @@
             document.getElementById('victory').style.display = 'flex';
         }
 
+        // Funciones de pausa
+        function togglePause() {
+            gamePaused = !gamePaused;
+            document.getElementById('pause-menu').style.display = gamePaused ? 'flex' : 'none';
+        }
+
+        function quitGame() {
+            gameRunning = false;
+            gamePaused = false;
+            document.getElementById('pause-menu').style.display = 'none';
+            document.getElementById('quit-screen').style.display = 'flex';
+        }
+
+        function showNewspaper() {
+            document.getElementById('quit-screen').style.display = 'none';
+            document.getElementById('newspaper-screen').style.display = 'flex';
+            
+            // Después de 5 segundos, permitir click
+            setTimeout(() => {
+                document.getElementById('newspaper-screen').style.pointerEvents = 'auto';
+            }, 5000);
+        }
+
+        function handleNewspaperClick() {
+            document.getElementById('newspaper-screen').style.display = 'none';
+            document.getElementById('game').style.display = 'none';
+            document.getElementById('menu').style.display = 'flex';
+            
+            // Reset completo
+            gameRunning = false;
+            gamePaused = false;
+            battery = 100;
+            hour = 0;
+            gameIntervals.forEach(interval => clearInterval(interval));
+            gameIntervals = [];
+        }
+
+        function handleJumpscareClick() {
+            // Después de ver el jumpscare, volver al menú
+            document.getElementById('jumpscare-screen').style.display = 'none';
+            document.getElementById('game').style.display = 'none';
+            document.getElementById('menu').style.display = 'flex';
+            
+            // Reset completo
+            gameRunning = false;
+            gamePaused = false;
+            battery = 100;
+            hour = 0;
+            gameIntervals.forEach(interval => clearInterval(interval));
+            gameIntervals = [];
+        }
+
         // Tecla Espacio para cámaras
         document.addEventListener('keydown', (e) => {
-            if (e.code === 'Space' && gameRunning) {
+            if (e.code === 'Space' && gameRunning && !gamePaused) {
                 e.preventDefault();
                 toggleCamera();
+            }
+            if (e.code === 'Escape' && gameRunning) {
+                e.preventDefault();
+                togglePause();
             }
         });
     </script>
