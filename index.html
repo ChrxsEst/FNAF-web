@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Five Nights at Freddy's</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: #000;
+            color: #fff;
+            overflow: hidden;
+        }
+
+        /* Menú Principal */
+        #menu {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background: linear-gradient(180deg, #1a0000 0%, #000 100%);
+        }
+
+        #menu h1 {
+            font-size: 3em;
+            color: #ff0000;
+            text-shadow: 0 0 20px #ff0000;
+            margin-bottom: 50px;
+            animation: flicker 2s infinite;
+        }
+
+        @keyframes flicker {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+
+        .menu-btn {
+            background: #330000;
+            border: 2px solid #ff0000;
+            color: #fff;
+            padding: 15px 40px;
+            margin: 10px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .menu-btn:hover {
+            background: #ff0000;
+            box-shadow: 0 0 20px #ff0000;
+        }
+
+        /* Selector de Dificultad */
+        #difficulty-screen {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background: #0a0a0a;
+        }
+
+        .difficulty-btn {
+            background: #1a1a1a;
+            border: 2px solid #00ff00;
+            color: #00ff00;
+            padding: 20px 60px;
+            margin: 15px;
+            font-size: 1.3em;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .difficulty-btn:hover {
+            background: #00ff00;
+            color: #000;
+        }
+
+        /* Controles */
+        #controls-screen {
+            display: none;
+            padding: 50px;
+            height: 100vh;
+            background: #0a0a0a;
+            overflow-y: auto;
+        }
+
+        #controls-screen h2 {
+            color: #ff0000;
+            margin-bottom: 30px;
+        }
+
+        #controls-screen p {
+            margin: 15px 0;
+            line-height: 1.6;
+        }
+
+        /* Juego */
+        #game {
+            display: none;
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        /* Oficina */
+        #office {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(180deg, #1a1a2e 0%, #0f0f1e 100%);
+            position: relative;
+        }
+
+        .office-view {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2em;
+            color: #666;
+        }
+
+        /* HUD */
+        #hud {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 100;
+        }
+
+        #battery, #time {
+            background: rgba(0,0,0,0.8);
+            padding: 10px 20px;
+            margin: 5px 0;
+            border: 2px solid #00ff00;
+            font-size: 1.2em;
+        }
+
+        #battery.low {
+            border-color: #ff0000;
+            color: #ff0000;
+        }
+
+        /* Puertas */
+        .door {
+            position: absolute;
+            width: 150px;
+            height: 100px;
+            bottom: 20%;
+            background: #555;
+            border: 3px solid #333;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9em;
+        }
+
+        #left-door {
+            left: 50px;
+        }
+
+        #right-door {
+            right: 50px;
+        }
+
+        .door.closed {
+            background: #ff0000;
+        }
+
+        .door-light {
+            margin-top: 10px;
+            padding: 5px 15px;
+            background: #333;
+            cursor: pointer;
+        }
+
+        .door-light:hover {
+            background: #ffff00;
+            color: #000;
+        }
+
+        /* Sistema de Cámaras */
+        #camera-system {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.95);
+            z-index: 50;
+        }
+
+        #camera-view {
+            width: 80%;
+            height: 70%;
+            margin: 2% auto;
+            border: 5px solid #00ff00;
+            background: #1a1a1a;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .camera-content {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding-top: 20px;
+            font-size: 1.5em;
+            color: #00ff00;
+            position: relative;
+        }
+
+        .animatronic {
+            width: 120px;
+            height: 180px;
+            background: #444;
+            border: 3px solid #fff;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-size: 1em;
+            font-weight: bold;
+            margin: 5px;
+            flex-shrink: 0;
+        }
+
+        #camera-name {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(0,0,0,0.8);
+            padding: 10px 20px;
+            border: 2px solid #00ff00;
+            font-size: 0.8em;
+        }
+
+        #camera-map {
+            width: 90%;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            padding: 20px;
+        }
+
+        .camera-btn {
+            background: #222;
+            border: 2px solid #00ff00;
+            color: #00ff00;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .camera-btn:hover, .camera-btn.active {
+            background: #00ff00;
+            color: #000;
+        }
+
+        #toggle-camera {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 15px 40px;
+            background: #333;
+            border: 2px solid #00ff00;
+            color: #00ff00;
+            cursor: pointer;
+            font-size: 1.2em;
+            z-index: 101;
+        }
+
+        #toggle-camera:hover {
+            background: #00ff00;
+            color: #000;
+        }
+
+        /* Game Over */
+        #game-over {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            z-index: 200;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #game-over h2 {
+            color: #ff0000;
+            font-size: 4em;
+            margin-bottom: 30px;
+            animation: flicker 1s infinite;
+        }
+
+        /* Victoria */
+        #victory {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(180deg, #001a00 0%, #000 100%);
+            z-index: 200;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #victory h2 {
+            color: #00ff00;
+            font-size: 4em;
+            margin-bottom: 30px;
+        }
+
+        .static {
+            animation: static 0.1s infinite;
+        }
+
+        @keyframes static {
+            0% { filter: grayscale(100%) contrast(200%); }
+            50% { filter: grayscale(100%) contrast(150%); }
+            100% { filter: grayscale(100%) contrast(200%); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Menú Principal -->
+    <div id="menu">
+        <h1>FIVE NIGHTS AT FREDDY'S</h1>
+        <button class="menu-btn" onclick="showDifficulty()">JUGAR</button>
+        <button class="menu-btn" onclick="showControls()">CONTROLES</button>
+    </div>
+
+    <!-- Selector de Dificultad -->
+    <div id="difficulty-screen">
+        <h2 style="margin-bottom: 40px; font-size: 2em;">SELECCIONA LA DIFICULTAD</h2>
+        <button class="difficulty-btn" onclick="startGame(1)">FÁCIL</button>
+        <button class="difficulty-btn" onclick="startGame(2)">NORMAL</button>
+        <button class="difficulty-btn" onclick="startGame(3)">DIFÍCIL</button>
+        <button class="menu-btn" onclick="backToMenu()" style="margin-top: 30px;">VOLVER</button>
+    </div>
+
+    <!-- Pantalla de Controles -->
+    <div id="controls-screen">
+        <h2>CONTROLES DEL JUEGO</h2>
+        <p><strong>ESPACIO:</strong> Abrir/Cerrar sistema de cámaras</p>
+        <p><strong>CLICK en botones de cámara:</strong> Cambiar entre cámaras</p>
+        <p><strong>CLICK en puertas:</strong> Abrir/Cerrar puertas (consume batería cuando están cerradas)</p>
+        <p><strong>CLICK en luces:</strong> Iluminar puertas para ver si hay animatrónicos (consume batería)</p>
+        <br>
+        <h3>OBJETIVO:</h3>
+        <p>Sobrevive desde las 12 AM hasta las 6 AM (6 minutos reales)</p>
+        <p>Vigila a los animatrónicos en las cámaras</p>
+        <p>Cierra las puertas cuando estén cerca</p>
+        <p>¡Administra tu batería sabiamente!</p>
+        <br>
+        <h3>ANIMATRÓNICOS:</h3>
+        <p><strong>FREDDY:</strong> Se mueve lentamente pero es muy peligroso</p>
+        <p><strong>BONNIE:</strong> Ataca por la puerta izquierda</p>
+        <p><strong>CHICA:</strong> Ataca por la puerta derecha</p>
+        <p><strong>FOXY:</strong> Si no lo vigilas, corre hacia tu oficina</p>
+        <button class="menu-btn" onclick="backToMenu()" style="margin-top: 30px;">VOLVER</button>
+    </div>
+
+    <!-- Juego -->
+    <div id="game">
+        <!-- HUD -->
+        <div id="hud">
+            <div id="battery">BATERÍA: 100%</div>
+            <div id="time">12 AM</div>
+        </div>
+
+        <!-- Oficina -->
+        <div id="office">
+            <div class="office-view">OFICINA DE SEGURIDAD</div>
+            
+            <!-- Puertas -->
+            <div id="left-door" class="door" onclick="toggleDoor('left')">
+                <div>PUERTA IZQ</div>
+                <div>ABIERTA</div>
+                <div class="door-light" onclick="event.stopPropagation(); checkDoor('left')">LUZ</div>
+            </div>
+            <div id="right-door" class="door" onclick="toggleDoor('right')">
+                <div>PUERTA DER</div>
+                <div>ABIERTA</div>
+                <div class="door-light" onclick="event.stopPropagation(); checkDoor('right')">LUZ</div>
+            </div>
+        </div>
+
+        <!-- Sistema de Cámaras -->
+        <div id="camera-system">
+            <div id="camera-view">
+                <div class="camera-content static">
+                    <span id="camera-name">CÁMARA 1A - ESCENARIO</span>
+                    <div class="animatronics-container">
+                        <div id="freddy-cam" class="animatronic" style="background: #8B4513;">FREDDY</div>
+                        <div id="bonnie-cam" class="animatronic" style="background: #4B0082;">BONNIE</div>
+                        <div id="chica-cam" class="animatronic" style="background: #FFD700; color: #000;">CHICA</div>
+                        <div id="foxy-cam" class="animatronic" style="background: #DC143C;">FOXY</div>
+                    </div>
+                </div>
+            </div>
+            <div id="camera-map">
+                <button class="camera-btn active" onclick="switchCamera('1A')">CAM 1A<br>ESCENARIO</button>
+                <button class="camera-btn" onclick="switchCamera('1B')">CAM 1B<br>COMEDOR</button>
+                <button class="camera-btn" onclick="switchCamera('1C')">CAM 1C<br>PIRATE COVE</button>
+                <button class="camera-btn" onclick="switchCamera('2A')">CAM 2A<br>PASILLO IZQ</button>
+                <button class="camera-btn" onclick="switchCamera('2B')">CAM 2B<br>PASILLO DER</button>
+                <button class="camera-btn" onclick="switchCamera('3')">CAM 3<br>SUMINISTROS</button>
+                <button class="camera-btn" onclick="switchCamera('4A')">CAM 4A<br>PUERTA IZQ</button>
+                <button class="camera-btn" onclick="switchCamera('4B')">CAM 4B<br>PUERTA DER</button>
+            </div>
+        </div>
+
+        <button id="toggle-camera" onclick="toggleCamera()">ABRIR CÁMARAS [ESPACIO]</button>
+
+        <!-- Game Over -->
+        <div id="game-over">
+            <h2>GAME OVER</h2>
+            <p style="font-size: 1.5em; margin-bottom: 30px;">Has sido atrapado...</p>
+            <button class="menu-btn" onclick="location.reload()">REINTENTAR</button>
+        </div>
+
+        <!-- Victoria -->
+        <div id="victory">
+            <h2>¡6 AM!</h2>
+            <p style="font-size: 1.5em; margin-bottom: 30px; color: #00ff00;">¡Has sobrevivido la noche!</p>
+            <button class="menu-btn" onclick="location.reload()">VOLVER AL MENÚ</button>
+        </div>
+    </div>
+
+    <script>
+        // Variables del juego
+        let battery = 100;
+        let hour = 0;
+        let difficulty = 1;
+        let gameRunning = false;
+        let cameraOpen = false;
+        let leftDoorClosed = false;
+        let rightDoorClosed = false;
+        let currentCamera = '1A';
+
+        // Posiciones de los animatrónicos
+        const animatronics = {
+            freddy: { position: '1A', atDoor: false },
+            bonnie: { position: '1A', atDoor: false },
+            chica: { position: '1A', atDoor: false },
+            foxy: { position: '1C', stage: 0, atDoor: false }
+        };
+
+        const cameras = ['1A', '1B', '2A', '2B', '3', '4A', '4B'];
+        const foxyStages = ['1C', '1C', '1C', '2A'];
+
+        // Funciones de menú
+        function showDifficulty() {
+            document.getElementById('menu').style.display = 'none';
+            document.getElementById('difficulty-screen').style.display = 'flex';
+        }
+
+        function showControls() {
+            document.getElementById('menu').style.display = 'none';
+            document.getElementById('controls-screen').style.display = 'block';
+        }
+
+        function backToMenu() {
+            document.getElementById('menu').style.display = 'flex';
+            document.getElementById('difficulty-screen').style.display = 'none';
+            document.getElementById('controls-screen').style.display = 'none';
+        }
+
+        function startGame(diff) {
+            difficulty = diff;
+            document.getElementById('difficulty-screen').style.display = 'none';
+            document.getElementById('game').style.display = 'block';
+            
+            // RESET: Todos empiezan en escenario excepto Foxy
+            animatronics.freddy.position = '1A';
+            animatronics.freddy.atDoor = false;
+            animatronics.bonnie.position = '1A';
+            animatronics.bonnie.atDoor = false;
+            animatronics.chica.position = '1A';
+            animatronics.chica.atDoor = false;
+            animatronics.foxy.position = '1C';
+            animatronics.foxy.stage = 0;
+            animatronics.foxy.atDoor = false;
+            
+            battery = 100;
+            hour = 0;
+            leftDoorClosed = false;
+            rightDoorClosed = false;
+            cameraOpen = false;
+            currentCamera = '1A';
+            
+            gameRunning = true;
+            
+            // Actualizar vista inicial
+            updateCameraView();
+            document.getElementById('time').textContent = '12 AM';
+            document.getElementById('battery').textContent = 'BATERÍA: 100%';
+            
+            initGame();
+        }
+
+        function initGame() {
+            // Iniciar reloj (6 minutos = 360 segundos = 6 horas del juego)
+            setInterval(updateTime, 60000); // 1 hora = 1 minuto real
+            
+            // Consumo de batería
+            setInterval(updateBattery, 100);
+            
+            // Movimiento de animatrónicos
+            setInterval(moveAnimatronics, 5000 / difficulty);
+            
+            // Foxy check
+            setInterval(foxyCheck, 3000 / difficulty);
+        }
+
+        function updateTime() {
+            if (!gameRunning) return;
+            hour++;
+            document.getElementById('time').textContent = `${hour + 12 > 12 ? hour : hour + 12} AM`;
+            
+            if (hour >= 6) {
+                victory();
+            }
+        }
+
+        function updateBattery() {
+            if (!gameRunning) return;
+            
+            let drain = 0;
+            if (cameraOpen) drain += 0.05;
+            if (leftDoorClosed) drain += 0.1;
+            if (rightDoorClosed) drain += 0.1;
+            
+            battery -= drain * difficulty * 0.1;
+            battery = Math.max(0, battery);
+            
+            const batteryEl = document.getElementById('battery');
+            batteryEl.textContent = `BATERÍA: ${Math.floor(battery)}%`;
+            
+            if (battery < 20) {
+                batteryEl.classList.add('low');
+            } else {
+                batteryEl.classList.remove('low');
+            }
+            
+            if (battery <= 0) {
+                powerOut();
+            }
+        }
+
+        function toggleCamera() {
+            cameraOpen = !cameraOpen;
+            document.getElementById('camera-system').style.display = cameraOpen ? 'block' : 'none';
+            document.getElementById('toggle-camera').textContent = cameraOpen ? 'CERRAR CÁMARAS [ESPACIO]' : 'ABRIR CÁMARAS [ESPACIO]';
+        }
+
+        function switchCamera(cam) {
+            currentCamera = cam;
+            document.querySelectorAll('.camera-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            const names = {
+                '1A': 'CÁMARA 1A - ESCENARIO',
+                '1B': 'CÁMARA 1B - COMEDOR',
+                '1C': 'CÁMARA 1C - PIRATE COVE',
+                '2A': 'CÁMARA 2A - PASILLO IZQUIERDO',
+                '2B': 'CÁMARA 2B - PASILLO DERECHO',
+                '3': 'CÁMARA 3 - SUMINISTROS',
+                '4A': 'CÁMARA 4A - PUERTA IZQUIERDA',
+                '4B': 'CÁMARA 4B - PUERTA DERECHA'
+            };
+            
+            document.getElementById('camera-name').textContent = names[cam];
+            updateCameraView();
+        }
+
+        function updateCameraView() {
+            // Ocultar todos primero
+            document.querySelectorAll('.animatronic').forEach(a => a.style.display = 'none');
+            
+            // Mostrar los que están en la cámara actual
+            if (animatronics.freddy.position === currentCamera) {
+                document.getElementById('freddy-cam').style.display = 'flex';
+            }
+            if (animatronics.bonnie.position === currentCamera) {
+                document.getElementById('bonnie-cam').style.display = 'flex';
+            }
+            if (animatronics.chica.position === currentCamera) {
+                document.getElementById('chica-cam').style.display = 'flex';
+            }
+            if (animatronics.foxy.position === currentCamera) {
+                document.getElementById('foxy-cam').style.display = 'flex';
+            }
+            
+            // Actualizar texto de la cámara con contador
+            const animsInCamera = [
+                animatronics.freddy.position === currentCamera ? 'FREDDY' : null,
+                animatronics.bonnie.position === currentCamera ? 'BONNIE' : null,
+                animatronics.chica.position === currentCamera ? 'CHICA' : null,
+                animatronics.foxy.position === currentCamera ? 'FOXY' : null
+            ].filter(a => a !== null);
+            
+            const names = {
+                '1A': 'CÁMARA 1A - ESCENARIO',
+                '1B': 'CÁMARA 1B - COMEDOR',
+                '1C': 'CÁMARA 1C - PIRATE COVE',
+                '2A': 'CÁMARA 2A - PASILLO IZQUIERDO',
+                '2B': 'CÁMARA 2B - PASILLO DERECHO',
+                '3': 'CÁMARA 3 - SUMINISTROS',
+                '4A': 'CÁMARA 4A - PUERTA IZQUIERDA',
+                '4B': 'CÁMARA 4B - PUERTA DERECHA'
+            };
+            
+            let cameraText = names[currentCamera];
+            if (animsInCamera.length > 0) {
+                cameraText += ` (${animsInCamera.length})`;
+            }
+            
+            document.getElementById('camera-name').textContent = cameraText;
+        }
+
+        function moveAnimatronics() {
+            if (!gameRunning) return;
+            
+            // Freddy
+            if (Math.random() < 0.3 * difficulty / 10) {
+                moveAnimatronic('freddy');
+            }
+            
+            // Bonnie (izquierda)
+            if (Math.random() < 0.4 * difficulty / 10) {
+                moveAnimatronic('bonnie', ['1A', '1B', '2A', '3', '4A']);
+            }
+            
+            // Chica (derecha)
+            if (Math.random() < 0.4 * difficulty / 10) {
+                moveAnimatronic('chica', ['1A', '1B', '2B', '3', '4B']);
+            }
+        }
+
+        function moveAnimatronic(name, route = cameras) {
+            const anim = animatronics[name];
+            if (anim.atDoor) return;
+            
+            const currentIndex = route.indexOf(anim.position);
+            if (currentIndex < route.length - 1) {
+                anim.position = route[currentIndex + 1];
+                
+                if ((name === 'bonnie' && anim.position === '4A') ||
+                    (name === 'chica' && anim.position === '4B') ||
+                    (name === 'freddy' && (anim.position === '4A' || anim.position === '4B'))) {
+                    anim.atDoor = true;
+                    checkJumpscare(name);
+                }
+            }
+            updateCameraView();
+        }
+
+        function foxyCheck() {
+            if (!gameRunning) return;
+            
+            // Si no miras a Foxy, avanza
+            if (currentCamera !== '1C' && cameraOpen) {
+                animatronics.foxy.stage++;
+                
+                if (animatronics.foxy.stage >= foxyStages.length) {
+                    foxyRun();
+                } else {
+                    animatronics.foxy.position = foxyStages[animatronics.foxy.stage];
+                }
+            }
+        }
+
+        function foxyRun() {
+            animatronics.foxy.atDoor = true;
+            animatronics.foxy.position = '4A';
+            
+            setTimeout(() => {
+                if (!leftDoorClosed) {
+                    gameOver('Foxy te ha atrapado!');
+                } else {
+                    battery -= 10; // Foxy drena batería aunque cierres
+                    animatronics.foxy.stage = 0;
+                    animatronics.foxy.position = '1C';
+                    animatronics.foxy.atDoor = false;
+                }
+            }, 2000);
+        }
+
+        function toggleDoor(side) {
+            if (side === 'left') {
+                leftDoorClosed = !leftDoorClosed;
+                const door = document.getElementById('left-door');
+                door.classList.toggle('closed');
+                door.children[1].textContent = leftDoorClosed ? 'CERRADA' : 'ABIERTA';
+            } else {
+                rightDoorClosed = !rightDoorClosed;
+                const door = document.getElementById('right-door');
+                door.classList.toggle('closed');
+                door.children[1].textContent = rightDoorClosed ? 'CERRADA' : 'ABIERTA';
+            }
+        }
+
+        function checkDoor(side) {
+            if (battery < 1) return;
+            battery -= 0.5;
+            
+            const atLeft = animatronics.bonnie.atDoor || (animatronics.freddy.atDoor && animatronics.freddy.position === '4A');
+            const atRight = animatronics.chica.atDoor || (animatronics.freddy.atDoor && animatronics.freddy.position === '4B');
+            
+            if ((side === 'left' && atLeft) || (side === 'right' && atRight)) {
+                alert('¡Hay alguien en la puerta!');
+            }
+        }
+
+        function checkJumpscare(name) {
+            setTimeout(() => {
+                if (!gameRunning) return;
+                
+                if (name === 'bonnie' && !leftDoorClosed && animatronics.bonnie.atDoor) {
+                    gameOver('Bonnie te ha atrapado!');
+                } else if (name === 'chica' && !rightDoorClosed && animatronics.chica.atDoor) {
+                    gameOver('Chica te ha atrapado!');
+                } else if (name === 'freddy') {
+                    const freddyLeft = animatronics.freddy.position === '4A' && !leftDoorClosed;
+                    const freddyRight = animatronics.freddy.position === '4B' && !rightDoorClosed;
+                    if ((freddyLeft || freddyRight) && animatronics.freddy.atDoor) {
+                        gameOver('Freddy te ha atrapado!');
+                    }
+                }
+                
+                // Reset si la puerta está cerrada
+                if ((name === 'bonnie' && leftDoorClosed) || 
+                    (name === 'chica' && rightDoorClosed) ||
+                    (name === 'freddy' && (leftDoorClosed || rightDoorClosed))) {
+                    setTimeout(() => {
+                        animatronics[name].atDoor = false;
+                        animatronics[name].position = '1A';
+                    }, 5000);
+                }
+            }, 1000);
+        }
+
+        function powerOut() {
+            gameRunning = false;
+            document.getElementById('office').style.background = '#000';
+            setTimeout(() => {
+                gameOver('¡Se acabó la energía!');
+            }, 3000);
+        }
+
+        function gameOver(msg) {
+            gameRunning = false;
+            document.getElementById('game-over').style.display = 'flex';
+            if (msg) {
+                document.getElementById('game-over').children[1].textContent = msg;
+            }
+        }
+
+        function victory() {
+            gameRunning = false;
+            document.getElementById('victory').style.display = 'flex';
+        }
+
+        // Tecla Espacio para cámaras
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space' && gameRunning) {
+                e.preventDefault();
+                toggleCamera();
+            }
+        });
+    </script>
+</body>
+</html>
