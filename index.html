@@ -126,6 +126,36 @@
             justify-content: center;
             font-size: 2em;
             color: #666;
+            position: relative;
+        }
+
+        /* Golden Freddy en oficina */
+        #golden-freddy {
+            display: none;
+            position: absolute;
+            bottom: 10%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 300px;
+            height: 400px;
+            background: linear-gradient(135deg, #FFD700 0%, #8B7500 100%);
+            border: 5px solid #FFD700;
+            align-items: center;
+            justify-content: center;
+            font-size: 2em;
+            font-weight: bold;
+            color: #000;
+            cursor: pointer;
+            animation: goldenGlitch 0.5s infinite;
+            box-shadow: 0 0 50px rgba(255, 215, 0, 0.8);
+            z-index: 90;
+        }
+
+        @keyframes goldenGlitch {
+            0%, 100% { opacity: 1; transform: translateX(-50%) translateY(0); }
+            25% { opacity: 0.8; transform: translateX(-50%) translateY(-5px); }
+            50% { opacity: 0.9; transform: translateX(-50%) translateY(5px); }
+            75% { opacity: 0.85; transform: translateX(-50%) translateY(-3px); }
         }
 
         /* HUD */
@@ -136,17 +166,58 @@
             z-index: 100;
         }
 
-        #battery, #time {
+        #battery-container {
+            background: rgba(0,0,0,0.8);
+            padding: 10px 20px;
+            margin: 5px 0;
+            border: 2px solid #00ff00;
+        }
+
+        #battery-label {
+            font-size: 1em;
+            margin-bottom: 5px;
+            color: #00ff00;
+        }
+
+        #battery-bars {
+            display: flex;
+            gap: 5px;
+        }
+
+        .battery-bar {
+            width: 30px;
+            height: 40px;
+            border: 2px solid #333;
+            background: #222;
+            position: relative;
+        }
+
+        .battery-bar.full {
+            background: linear-gradient(180deg, #00ff00 0%, #00cc00 100%);
+            border-color: #00ff00;
+        }
+
+        .battery-bar.high {
+            background: linear-gradient(180deg, #90EE90 0%, #00ff00 100%);
+            border-color: #00ff00;
+        }
+
+        .battery-bar.medium {
+            background: linear-gradient(180deg, #ffff00 0%, #ffa500 100%);
+            border-color: #ffff00;
+        }
+
+        .battery-bar.low {
+            background: linear-gradient(180deg, #ff6600 0%, #ff0000 100%);
+            border-color: #ff0000;
+        }
+
+        #time {
             background: rgba(0,0,0,0.8);
             padding: 10px 20px;
             margin: 5px 0;
             border: 2px solid #00ff00;
             font-size: 1.2em;
-        }
-
-        #battery.low {
-            border-color: #ff0000;
-            color: #ff0000;
         }
 
         /* Puertas */
@@ -164,6 +235,7 @@
             align-items: center;
             justify-content: center;
             font-size: 0.9em;
+            z-index: 90;
         }
 
         #left-door {
@@ -178,16 +250,28 @@
             background: #ff0000;
         }
 
-        .door-light {
-            margin-top: 10px;
-            padding: 5px 15px;
-            background: #333;
-            cursor: pointer;
+        /* Indicador de animatrónico en puerta */
+        .door-indicator {
+            position: absolute;
+            bottom: 35%;
+            width: 200px;
+            height: 250px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+            font-weight: bold;
+            z-index: 85;
+            pointer-events: none;
+            opacity: 0.8;
         }
 
-        .door-light:hover {
-            background: #ffff00;
-            color: #000;
+        #left-indicator {
+            left: 30px;
+        }
+
+        #right-indicator {
+            right: 30px;
         }
 
         /* Sistema de Cámaras */
@@ -255,7 +339,7 @@
         #camera-name {
             position: absolute;
             top: 20px;
-            left: 20px;
+            right: 20px;
             background: rgba(0,0,0,0.8);
             padding: 10px 20px;
             border: 2px solid #00ff00;
@@ -413,20 +497,41 @@
             height: 100%;
             background: #000;
             z-index: 202;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
+            cursor: pointer;
+        }
+
+        #jumpscare-text {
+            text-align: center;
+            margin-bottom: 30px;
+            animation: flicker 0.5s infinite;
+        }
+
+        #jumpscare-text h2 {
+            color: #ff0000;
+            font-size: 5em;
+            margin-bottom: 20px;
+            text-shadow: 0 0 20px #ff0000;
+        }
+
+        #jumpscare-text p {
+            color: #ff0000;
+            font-size: 2em;
+            text-shadow: 0 0 10px #ff0000;
         }
 
         #jumpscare-screen img {
-            max-width: 100%;
-            max-height: 100%;
+            max-width: 70%;
+            max-height: 60%;
             object-fit: contain;
-            animation: jumpscare 0.2s ease-in-out;
+            animation: jumpscare 0.3s ease-in-out;
         }
 
         @keyframes jumpscare {
-            0% { transform: scale(0.8); opacity: 0; }
-            50% { transform: scale(1.1); }
+            0% { transform: scale(0.5); opacity: 0; }
+            50% { transform: scale(1.2); }
             100% { transform: scale(1); opacity: 1; }
         }
             display: none;
@@ -527,24 +632,43 @@
 
         <!-- HUD -->
         <div id="hud">
-            <div id="battery">BATERÍA: 100%</div>
+            <div id="battery-container">
+                <div id="battery-label">BATERÍA</div>
+                <div id="battery-bars">
+                    <div class="battery-bar full" id="bar1"></div>
+                    <div class="battery-bar full" id="bar2"></div>
+                    <div class="battery-bar full" id="bar3"></div>
+                    <div class="battery-bar full" id="bar4"></div>
+                </div>
+            </div>
             <div id="time">12 AM</div>
         </div>
 
         <!-- Oficina -->
         <div id="office">
-            <div class="office-view">OFICINA DE SEGURIDAD</div>
+            <div class="office-view">
+                OFICINA DE SEGURIDAD
+                
+                <!-- Golden Freddy (solo en modo difícil) -->
+                <div id="golden-freddy" onclick="dismissGoldenFreddy()">
+                    <div style="font-size: 1.5em;">👻</div>
+                    <div>GOLDEN</div>
+                    <div>FREDDY</div>
+                </div>
+                
+                <!-- Indicadores de animatrónicos en puertas -->
+                <div id="left-indicator" class="door-indicator"></div>
+                <div id="right-indicator" class="door-indicator"></div>
+            </div>
             
             <!-- Puertas -->
             <div id="left-door" class="door" onclick="toggleDoor('left')">
                 <div>PUERTA IZQ</div>
                 <div>ABIERTA</div>
-                <div class="door-light" onclick="event.stopPropagation(); checkDoor('left')">LUZ</div>
             </div>
             <div id="right-door" class="door" onclick="toggleDoor('right')">
                 <div>PUERTA DER</div>
                 <div>ABIERTA</div>
-                <div class="door-light" onclick="event.stopPropagation(); checkDoor('right')">LUZ</div>
             </div>
         </div>
 
@@ -608,6 +732,10 @@
 
         <!-- Pantalla de jumpscare -->
         <div id="jumpscare-screen" onclick="handleJumpscareClick()">
+            <div id="jumpscare-text">
+                <h2>¡PERDISTE!</h2>
+                <p id="jumpscare-message"></p>
+            </div>
             <img id="jumpscare-img" src="" alt="Jumpscare">
         </div>
 
@@ -638,13 +766,15 @@
         let rightDoorClosed = false;
         let currentCamera = '1A';
         let gameIntervals = [];
+        let goldenFreddyActive = false;
+        let goldenFreddyTimeout = null;
 
         // Posiciones de los animatrónicos
         const animatronics = {
-            freddy: { position: '1A', atDoor: false },
-            bonnie: { position: '1A', atDoor: false },
-            chica: { position: '1A', atDoor: false },
-            foxy: { position: '1C', stage: 0, atDoor: false }
+            freddy: { position: '1A', atDoor: false, side: null },
+            bonnie: { position: '1A', atDoor: false, side: 'left' },
+            chica: { position: '1A', atDoor: false, side: 'right' },
+            foxy: { position: '1C', stage: 0, atDoor: false, side: 'left' }
         };
 
         const cameras = ['1A', '1B', '2A', '2B', '3', '4A', '4B'];
@@ -690,12 +820,18 @@
             cameraOpen = false;
             currentCamera = '1A';
             
+            // Resetear puertas visualmente
+            document.getElementById('left-door').classList.remove('closed');
+            document.getElementById('right-door').classList.remove('closed');
+            document.getElementById('left-door').children[1].textContent = 'ABIERTA';
+            document.getElementById('right-door').children[1].textContent = 'ABIERTA';
+            
             gameRunning = true;
             
             // Actualizar vista inicial
             updateCameraView();
+            updateBattery();
             document.getElementById('time').textContent = '12 AM';
-            document.getElementById('battery').textContent = 'BATERÍA: 100%';
             
             initGame();
         }
@@ -711,11 +847,18 @@
             // Consumo de batería
             gameIntervals.push(setInterval(updateBattery, 100));
             
-            // Movimiento de animatrónicos
-            gameIntervals.push(setInterval(moveAnimatronics, 5000 / difficulty));
+            // Movimiento de animatrónicos (velocidad ajustada por dificultad)
+            const moveSpeed = difficulty === 3 ? 7000 : (difficulty === 2 ? 5000 : 8000);
+            gameIntervals.push(setInterval(moveAnimatronics, moveSpeed));
             
-            // Foxy check
-            gameIntervals.push(setInterval(foxyCheck, 3000 / difficulty));
+            // Foxy check (velocidad ajustada por dificultad)
+            const foxySpeed = difficulty === 3 ? 4000 : (difficulty === 2 ? 3000 : 5000);
+            gameIntervals.push(setInterval(foxyCheck, foxySpeed));
+            
+            // Golden Freddy solo en modo difícil
+            if (difficulty === 3) {
+                gameIntervals.push(setInterval(trySpawnGoldenFreddy, 2000)); // Cada 2 segundos intenta aparecer (10% prob)
+            }
         }
 
         function updateTime() {
@@ -739,13 +882,41 @@
             battery -= drain * difficulty * 0.1;
             battery = Math.max(0, battery);
             
-            const batteryEl = document.getElementById('battery');
-            batteryEl.textContent = `BATERÍA: ${Math.floor(battery)}%`;
+            // Actualizar barras de batería
+            const bars = [
+                document.getElementById('bar1'),
+                document.getElementById('bar2'),
+                document.getElementById('bar3'),
+                document.getElementById('bar4')
+            ];
             
-            if (battery < 20) {
-                batteryEl.classList.add('low');
+            // Calcular cuántas barras están llenas
+            const fullBars = Math.ceil(battery / 25);
+            
+            bars.forEach((bar, index) => {
+                bar.className = 'battery-bar';
+                if (index < fullBars) {
+                    // Determinar el color según el nivel de batería
+                    if (battery > 75) {
+                        bar.classList.add('full');
+                    } else if (battery > 50) {
+                        bar.classList.add('high');
+                    } else if (battery > 25) {
+                        bar.classList.add('medium');
+                    } else {
+                        bar.classList.add('low');
+                    }
+                }
+            });
+            
+            // Actualizar color del label
+            const label = document.getElementById('battery-label');
+            if (battery > 50) {
+                label.style.color = '#00ff00';
+            } else if (battery > 25) {
+                label.style.color = '#ffff00';
             } else {
-                batteryEl.classList.remove('low');
+                label.style.color = '#ff0000';
             }
             
             if (battery <= 0) {
@@ -753,10 +924,27 @@
             }
         }
 
-        function toggleCamera() {
-            cameraOpen = !cameraOpen;
-            document.getElementById('camera-system').style.display = cameraOpen ? 'block' : 'none';
-            document.getElementById('toggle-camera').textContent = cameraOpen ? 'CERRAR CÁMARAS [ESPACIO]' : 'ABRIR CÁMARAS [ESPACIO]';
+        // Funciones de pausa
+        function togglePause() {
+            gamePaused = !gamePaused;
+            document.getElementById('pause-menu').style.display = gamePaused ? 'flex' : 'none';
+        }
+
+        function quitGame() {
+            gameRunning = false;
+            gamePaused = false;
+            document.getElementById('pause-menu').style.display = 'none';
+            document.getElementById('quit-screen').style.display = 'flex';
+        }
+
+        function showNewspaper() {
+            document.getElementById('quit-screen').style.display = 'none';
+            document.getElementById('newspaper-screen').style.display = 'flex';
+            
+            // Después de 5 segundos, permitir click
+            setTimeout(() => {
+                document.getElementById('newspaper-screen').style.pointerEvents = 'auto';
+            }, 5000);
         }
 
         function switchCamera(cam) {
@@ -827,18 +1015,23 @@
         function moveAnimatronics() {
             if (!gameRunning || gamePaused) return;
             
+            // Probabilidades ajustadas por dificultad
+            const freddyChance = difficulty === 3 ? 0.25 : (difficulty === 2 ? 0.3 : 0.2);
+            const bonnieChance = difficulty === 3 ? 0.35 : (difficulty === 2 ? 0.4 : 0.3);
+            const chicaChance = difficulty === 3 ? 0.35 : (difficulty === 2 ? 0.4 : 0.3);
+            
             // Freddy
-            if (Math.random() < 0.3 * difficulty / 10) {
+            if (Math.random() < freddyChance) {
                 moveAnimatronic('freddy');
             }
             
             // Bonnie (izquierda)
-            if (Math.random() < 0.4 * difficulty / 10) {
+            if (Math.random() < bonnieChance) {
                 moveAnimatronic('bonnie', ['1A', '1B', '2A', '3', '4A']);
             }
             
             // Chica (derecha)
-            if (Math.random() < 0.4 * difficulty / 10) {
+            if (Math.random() < chicaChance) {
                 moveAnimatronic('chica', ['1A', '1B', '2B', '3', '4B']);
             }
         }
@@ -851,14 +1044,25 @@
             if (currentIndex < route.length - 1) {
                 anim.position = route[currentIndex + 1];
                 
+                // Si llega a una cámara de puerta (4A o 4B), marcar que está en la puerta
                 if ((name === 'bonnie' && anim.position === '4A') ||
                     (name === 'chica' && anim.position === '4B') ||
                     (name === 'freddy' && (anim.position === '4A' || anim.position === '4B'))) {
                     anim.atDoor = true;
-                    checkJumpscare(name);
+                    
+                    // Guardar en qué lado está Freddy
+                    if (name === 'freddy') {
+                        anim.side = anim.position === '4A' ? 'left' : 'right';
+                    }
+                    
+                    // Esperar un momento antes de intentar entrar
+                    setTimeout(() => {
+                        attemptEntry(name);
+                    }, 3000);
                 }
             }
             updateCameraView();
+            updateDoorIndicators();
         }
 
         function foxyCheck() {
@@ -879,17 +1083,104 @@
         function foxyRun() {
             animatronics.foxy.atDoor = true;
             animatronics.foxy.position = '4A';
+            updateDoorIndicators();
             
             setTimeout(() => {
-                if (!leftDoorClosed) {
-                    gameOver('Foxy te ha atrapado!');
-                } else {
-                    battery -= 10; // Foxy drena batería aunque cierres
-                    animatronics.foxy.stage = 0;
-                    animatronics.foxy.position = '1C';
-                    animatronics.foxy.atDoor = false;
-                }
+                attemptEntry('foxy');
             }, 2000);
+        }
+
+        function attemptEntry(name) {
+            if (!gameRunning || gamePaused) return;
+            
+            const anim = animatronics[name];
+            if (!anim.atDoor) return;
+            
+            // Verificar si la puerta correcta está cerrada
+            const doorClosed = (anim.side === 'left' && leftDoorClosed) || 
+                              (anim.side === 'right' && rightDoorClosed);
+            
+            if (!doorClosed) {
+                // Si la puerta está abierta, entra y mata al jugador
+                gameOver(`${name.charAt(0).toUpperCase() + name.slice(1)} te ha atrapado!`);
+            } else {
+                // Si la puerta está cerrada, se va después de un tiempo
+                if (name === 'foxy') {
+                    battery -= 10; // Foxy drena batería aunque cierres
+                }
+                
+                setTimeout(() => {
+                    anim.atDoor = false;
+                    anim.position = '1A';
+                    if (name === 'foxy') {
+                        animatronics.foxy.stage = 0;
+                        animatronics.foxy.position = '1C';
+                    }
+                    updateDoorIndicators();
+                }, 5000);
+            }
+        }
+
+        function updateDoorIndicators() {
+            const leftIndicator = document.getElementById('left-indicator');
+            const rightIndicator = document.getElementById('right-indicator');
+            
+            // Limpiar indicadores
+            leftIndicator.style.display = 'none';
+            rightIndicator.style.display = 'none';
+            leftIndicator.innerHTML = '';
+            rightIndicator.innerHTML = '';
+            
+            // Mostrar animatrónicos en las puertas
+            if (animatronics.bonnie.atDoor && animatronics.bonnie.position === '4A') {
+                leftIndicator.innerHTML = `
+                    <div style="background: linear-gradient(135deg, #6A5ACD 0%, #4B0082 100%); 
+                                border: 3px solid #4B0082; padding: 20px; width: 100%; height: 100%;
+                                display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                        <div style="font-size: 2em;">🐰</div>
+                        <div>BONNIE</div>
+                    </div>
+                `;
+                leftIndicator.style.display = 'flex';
+            }
+            
+            if (animatronics.chica.atDoor && animatronics.chica.position === '4B') {
+                rightIndicator.innerHTML = `
+                    <div style="background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%); 
+                                border: 3px solid #FFA500; padding: 20px; width: 100%; height: 100%;
+                                display: flex; flex-direction: column; align-items: center; justify-content: center;
+                                color: #000;">
+                        <div style="font-size: 2em;">🐤</div>
+                        <div>CHICA</div>
+                    </div>
+                `;
+                rightIndicator.style.display = 'flex';
+            }
+            
+            if (animatronics.foxy.atDoor && animatronics.foxy.position === '4A') {
+                leftIndicator.innerHTML = `
+                    <div style="background: linear-gradient(135deg, #8B0000 0%, #DC143C 100%); 
+                                border: 3px solid #8B0000; padding: 20px; width: 100%; height: 100%;
+                                display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                        <div style="font-size: 2em;">🦊</div>
+                        <div>FOXY</div>
+                    </div>
+                `;
+                leftIndicator.style.display = 'flex';
+            }
+            
+            if (animatronics.freddy.atDoor) {
+                const side = animatronics.freddy.side === 'left' ? leftIndicator : rightIndicator;
+                side.innerHTML = `
+                    <div style="background: linear-gradient(135deg, #8B4513 0%, #654321 100%); 
+                                border: 3px solid #654321; padding: 20px; width: 100%; height: 100%;
+                                display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                        <div style="font-size: 2em;">🐻</div>
+                        <div>FREDDY</div>
+                    </div>
+                `;
+                side.style.display = 'flex';
+            }
         }
 
         function toggleDoor(side) {
@@ -906,46 +1197,6 @@
             }
         }
 
-        function checkDoor(side) {
-            if (battery < 1) return;
-            battery -= 0.5;
-            
-            const atLeft = animatronics.bonnie.atDoor || (animatronics.freddy.atDoor && animatronics.freddy.position === '4A');
-            const atRight = animatronics.chica.atDoor || (animatronics.freddy.atDoor && animatronics.freddy.position === '4B');
-            
-            if ((side === 'left' && atLeft) || (side === 'right' && atRight)) {
-                alert('¡Hay alguien en la puerta!');
-            }
-        }
-
-        function checkJumpscare(name) {
-            setTimeout(() => {
-                if (!gameRunning || gamePaused) return;
-                
-                if (name === 'bonnie' && !leftDoorClosed && animatronics.bonnie.atDoor) {
-                    gameOver('Bonnie te ha atrapado!');
-                } else if (name === 'chica' && !rightDoorClosed && animatronics.chica.atDoor) {
-                    gameOver('Chica te ha atrapado!');
-                } else if (name === 'freddy') {
-                    const freddyLeft = animatronics.freddy.position === '4A' && !leftDoorClosed;
-                    const freddyRight = animatronics.freddy.position === '4B' && !rightDoorClosed;
-                    if ((freddyLeft || freddyRight) && animatronics.freddy.atDoor) {
-                        gameOver('Freddy te ha atrapado!');
-                    }
-                }
-                
-                // Reset si la puerta está cerrada
-                if ((name === 'bonnie' && leftDoorClosed) || 
-                    (name === 'chica' && rightDoorClosed) ||
-                    (name === 'freddy' && (leftDoorClosed || rightDoorClosed))) {
-                    setTimeout(() => {
-                        animatronics[name].atDoor = false;
-                        animatronics[name].position = '1A';
-                    }, 5000);
-                }
-            }, 1000);
-        }
-
         function powerOut() {
             gameRunning = false;
             document.getElementById('office').style.background = '#000';
@@ -959,22 +1210,35 @@
             
             // Determinar qué animatrónico causó el game over
             let jumpscareImage = '';
+            let animatronicName = '';
+            
             if (msg.includes('Freddy')) {
                 jumpscareImage = 'fredy.jpg';
+                animatronicName = 'Freddy';
             } else if (msg.includes('Bonnie')) {
                 jumpscareImage = 'boni.jpg';
+                animatronicName = 'Bonnie';
             } else if (msg.includes('Chica')) {
                 jumpscareImage = 'chica.jpeg';
+                animatronicName = 'Chica';
             } else if (msg.includes('Foxy')) {
                 jumpscareImage = 'foxy.jpg';
+                animatronicName = 'Foxy';
+            } else if (msg.includes('Golden')) {
+                jumpscareImage = 'golden.jpg';
+                animatronicName = 'Golden Freddy';
             } else {
-                jumpscareImage = 'golden.jpg'; // Por defecto o por quedarse sin energía
+                jumpscareImage = 'golden.jpg';
+                animatronicName = 'La oscuridad';
             }
             
             // Mostrar jumpscare
             const jumpscareScreen = document.getElementById('jumpscare-screen');
             const jumpscareImg = document.getElementById('jumpscare-img');
+            const jumpscareMessage = document.getElementById('jumpscare-message');
+            
             jumpscareImg.src = jumpscareImage;
+            jumpscareMessage.textContent = `${animatronicName} te atrapó`;
             jumpscareScreen.style.display = 'flex';
             
             // Reproducir sonido de susto (opcional, puedes agregar audio después)
@@ -985,9 +1249,56 @@
         function victory() {
             gameRunning = false;
             document.getElementById('victory').style.display = 'flex';
+            
+            // Limpiar Golden Freddy si estaba activo
+            if (goldenFreddyTimeout) {
+                clearTimeout(goldenFreddyTimeout);
+            }
+            document.getElementById('golden-freddy').style.display = 'none';
         }
 
-        // Funciones de pausa
+        // Funciones de Golden Freddy
+        function trySpawnGoldenFreddy() {
+            if (!gameRunning || gamePaused || goldenFreddyActive || cameraOpen) return;
+            
+            // 1 en 10 posibilidades (10%)
+            if (Math.random() < 0.1) {
+                spawnGoldenFreddy();
+            }
+        }
+
+        function spawnGoldenFreddy() {
+            goldenFreddyActive = true;
+            document.getElementById('golden-freddy').style.display = 'flex';
+            
+            // 10 segundos para hacer click o abrir cámaras
+            goldenFreddyTimeout = setTimeout(() => {
+                if (goldenFreddyActive && gameRunning) {
+                    gameOver('Golden Freddy te ha atrapado!');
+                }
+            }, 10000);
+        }
+
+        function dismissGoldenFreddy() {
+            if (goldenFreddyActive) {
+                goldenFreddyActive = false;
+                document.getElementById('golden-freddy').style.display = 'none';
+                if (goldenFreddyTimeout) {
+                    clearTimeout(goldenFreddyTimeout);
+                }
+            }
+        }
+
+        function toggleCamera() {
+            cameraOpen = !cameraOpen;
+            document.getElementById('camera-system').style.display = cameraOpen ? 'block' : 'none';
+            document.getElementById('toggle-camera').textContent = cameraOpen ? 'CERRAR CÁMARAS [ESPACIO]' : 'ABRIR CÁMARAS [ESPACIO]';
+            
+            // Abrir cámaras también ahuyenta a Golden Freddy
+            if (cameraOpen && goldenFreddyActive) {
+                dismissGoldenFreddy();
+            }
+        }
         function togglePause() {
             gamePaused = !gamePaused;
             document.getElementById('pause-menu').style.display = gamePaused ? 'flex' : 'none';
@@ -1010,33 +1321,14 @@
             }, 5000);
         }
 
-        function handleNewspaperClick() {
-            document.getElementById('newspaper-screen').style.display = 'none';
-            document.getElementById('game').style.display = 'none';
-            document.getElementById('menu').style.display = 'flex';
-            
-            // Reset completo
-            gameRunning = false;
-            gamePaused = false;
-            battery = 100;
-            hour = 0;
-            gameIntervals.forEach(interval => clearInterval(interval));
-            gameIntervals = [];
+        function handleJumpscareClick() {
+            // Recargar la página para reiniciar completamente
+            location.reload();
         }
 
-        function handleJumpscareClick() {
-            // Después de ver el jumpscare, volver al menú
-            document.getElementById('jumpscare-screen').style.display = 'none';
-            document.getElementById('game').style.display = 'none';
-            document.getElementById('menu').style.display = 'flex';
-            
-            // Reset completo
-            gameRunning = false;
-            gamePaused = false;
-            battery = 100;
-            hour = 0;
-            gameIntervals.forEach(interval => clearInterval(interval));
-            gameIntervals = [];
+        function handleNewspaperClick() {
+            // Recargar la página para reiniciar completamente
+            location.reload();
         }
 
         // Tecla Espacio para cámaras
